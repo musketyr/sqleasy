@@ -1,5 +1,6 @@
 package eu.ebdit.sqleasy;
 
+
 /**
  * Vysledek dotazu do databaze. K ziskani potrebnych dat
  * z vysledku pouzijte metodu {@link #processWith(ResultProcessor)}

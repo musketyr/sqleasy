@@ -1,16 +1,14 @@
-package eu.ebdit.sqleasy.util;
+package eu.ebdit.sqleasy.checkers;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
-
 import eu.ebdit.sqleasy.SqlEasy;
-import eu.ebdit.sqleasy.SqlChecker;
 
 /**
  * Kontrolor, ktery hlida, aby nebyly mazany triggery, ktere neexistuji,

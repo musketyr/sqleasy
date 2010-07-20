@@ -1,4 +1,4 @@
-package eu.ebdit.sqleasy.util;
+package eu.ebdit.sqleasy.checkers;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -10,8 +10,9 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.sun.xml.internal.ws.util.StringUtils;
+
 import eu.ebdit.sqleasy.SqlEasy;
-import eu.ebdit.sqleasy.SqlChecker;
 
 /**
  * Kontrolor, ktery testuje, aby se do databaze nevkladali duplicitni hodnoty.

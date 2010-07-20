@@ -1,6 +1,8 @@
-package eu.ebdit.sqleasy;
+package eu.ebdit.sqleasy.checkers;
 
 import java.sql.Connection;
+
+import eu.ebdit.sqleasy.SqlHelper;
 
 
 

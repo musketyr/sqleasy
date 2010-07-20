@@ -4,13 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.omg.CORBA.portable.ApplicationException;
 
-import cz.iccc.sima.exceptions.base.ApplicationException;
-import cz.iccc.sima.utils.StringUtils;
+import com.sun.xml.internal.ws.util.StringUtils;
 
 
 /**

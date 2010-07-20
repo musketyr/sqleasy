@@ -1,17 +1,17 @@
-package eu.ebdit.sqleasy;
+package eu.ebdit.sqleasy.handlers;
 
 import java.sql.SQLException;
+
 
 
 /**
  * Simple interface for handling SQL exceptions.
  * @author Vladimir Orany
  *
- * @see SqlEasy#asIterable(java.sql.ResultSet) ukazka vhodneho zpusobu vyuziti
  */
-public interface SqlExceptionHandler {
+public interface ExceptionHandler {
 	/**
-	 * Handles SQL exception.
+	 * Handles exception.
 	 * @param ex thrown exception
 	 */
 	void handleException(SQLException ex);

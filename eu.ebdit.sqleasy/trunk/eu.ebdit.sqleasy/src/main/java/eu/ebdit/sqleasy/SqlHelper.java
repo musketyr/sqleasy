@@ -1,10 +1,12 @@
 package eu.ebdit.sqleasy;
 
-import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
 
-import cz.iccc.sima.exceptions.base.ApplicationException;
+import org.omg.CORBA.portable.ApplicationException;
+
+import eu.ebdit.sqleasy.checkers.SqlChecker;
+import eu.ebdit.sqleasy.handlers.ExceptionHandler;
+import eu.ebdit.sqleasy.handlers.ExceptionHandlers;
 
 /**
  * Rozhrani pro jednoduche provadeni prikazu do databaze. Tridy implementujici
@@ -18,30 +20,7 @@ import cz.iccc.sima.exceptions.base.ApplicationException;
  */
 public interface SqlHelper {
 	
-	/**
-	 * Centralizovany log pro vypisovani sql
-	 */
-	Logger LOG = Logger.getLogger(SqlHelper.class);
 	
-	
-	/**
-	 * Zakladni obsluzna trida vyjimek pri komunikaci s databazi. 
-	 * Nedela nic.
-	 * @author Vladimir Orany
-	 *
-	 */
-	enum ZakladniSpravceSqlVyjimek implements SqlExceptionHandler {
-		
-		/**
-		 * Sdilena instance handleru
-		 */
-		INSTANCE;
-		
-		public void handleException(SQLException e) {}
-
-	}
-	
-
 	/**
 	 * Zahaji novou transakci. Opetovne zavolani vyusti ve vytovreni vnorene transakce. 
 	 * Transakce je automaticky zrusena, pokud dojde k chybe behem provadeni sql prikazu.
@@ -66,16 +45,16 @@ public interface SqlHelper {
 	
 	/**
 	 * Vrati spravce vyjimek. Hodnota musi byt vzdy nenullova, misto vraceni <code>null</code>
-	 * musi implementatori vracet {@link ZakladniSpravceSqlVyjimek#INSTANCE}.
+	 * musi implementatori vracet {@link  ExceptionHandlers#defaultHandler()}.
 	 * @return spravce vyjimek
 	 */
-	SqlExceptionHandler getSpravce();
+	ExceptionHandler getSpravce();
 	
 	/**
 	 * Nastavi noveho spravce vyjimek.
 	 * @param handler novy spravce vyjimek
 	 */
-	void setSpravce(SqlExceptionHandler handler);
+	void setSpravce(ExceptionHandler handler);
 	
 	/**
 	 * Provede SQL dotaz a vrati vysledek jako instanci rozhrani {@link QueryResult}.
