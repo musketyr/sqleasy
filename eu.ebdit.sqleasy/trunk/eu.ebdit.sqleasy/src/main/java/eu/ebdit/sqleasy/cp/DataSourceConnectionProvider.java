@@ -35,7 +35,7 @@ class DataSourceConnectionProvider extends DirectDataSourceConnectionProvider {
 			dsCache.put(dsName, dataSource);
 			return dataSource;
 		} catch (NamingException e) {
-			throw new IllegalArgumentException("Datasource \"" + dsName + " does not exist!", e);
+			throw new IllegalArgumentException("Datasource \"" + dsName + "\" does not exist!", e);
 		}
 	}
 	
