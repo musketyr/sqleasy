@@ -24,24 +24,16 @@ import eu.ebdit.sqleasy.handlers.ExceptionHandlers;
  */
 public class DbUnitDataLoader
 {
-    private InputStream testData;
-    private Connection connection;
-
-	private ConnectionProvider connectionProvider;
+	private static ConnectionProvider connectionProvider = ConnectionProviders.usingDriverManager("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:my-project-test", "sa", "");
     
-    public DbUnitDataLoader(InputStream testData, Connection connection)
+    public static void populateTestData() throws Exception
     {
-        this.testData = testData;
-        this.connection = connection;
-    }
+        InputStream testData = DbUnitDataLoader.class.getResourceAsStream("/user.db.xml");
 
-    /**
-     * Replace existing data with test data
-     * 
-     * @throws Exception
-     */
-    public void populateTestData() throws Exception
-    {
+        connectionProvider = ConnectionProviders.usingDriverManager("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:my-project-test", "sa", "");
+
+        DbUnitDataLoader loader = new DbUnitDataLoader(testData, connectionProvider.getConnection(ExceptionHandlers.stackTraceHandler()));
+        
         FlatXmlDataSet dataSet = new FlatXmlDataSet(testData);
 
         IDatabaseConnection con = new DatabaseConnection(connection);
@@ -49,17 +41,5 @@ public class DbUnitDataLoader
         DatabaseOperation.CLEAN_INSERT.execute(con, dataSet);
 
         con.close();
-    }
-    
-
-    public void setUp() throws Exception
-    {
-        InputStream testData = DbUnitDataLoader.class.getResourceAsStream("/user.db.xml");
-
-        connectionProvider = ConnectionProviders.usingDriverManager("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:my-project-test", "sa", "");
-
-        DbUnitDataLoader loader = new DbUnitDataLoader(testData, connectionProvider.getConnection(ExceptionHandlers.stackTraceHandler()));
-
-        loader.populateTestData();
     }
 }
