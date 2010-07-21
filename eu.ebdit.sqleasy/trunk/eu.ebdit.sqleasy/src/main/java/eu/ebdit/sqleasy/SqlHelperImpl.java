@@ -125,7 +125,7 @@ class SqlHelperImpl implements SqlHelper {
 						try {
 							return rs.next();
 						} catch (SQLException e) {
-							getSpravce().handleException(e);
+							getHandler().handleException(e);
 							return false;
 						}
 					}
@@ -150,7 +150,7 @@ class SqlHelperImpl implements SqlHelper {
 				s.close();
 			}
 		} catch (SQLException e) {
-			getSpravce().handleException(e);
+			getHandler().handleException(e);
 		}
 	}
 	
@@ -160,7 +160,7 @@ class SqlHelperImpl implements SqlHelper {
 				c.close();
 			}
 		} catch (SQLException e) {
-			getSpravce().handleException(e);
+			getHandler().handleException(e);
 		}
 	}
 
@@ -175,21 +175,21 @@ class SqlHelperImpl implements SqlHelper {
 		connectionProvider = provider;
 	}
 
-	public void setSpravce(ExceptionHandler handler) {
+	public void setHandler(ExceptionHandler handler) {
 		this.handler = handler;
 	}
 
-	public ExceptionHandler getSpravce() {
+	public ExceptionHandler getHandler() {
 		return ExceptionHandlers.nullSafe(handler);
 	}
 
-	public int provedAktualizaci(String sql, Object... parametry) {
+	public int execute(String sql, Object... parametry) {
 		TypVolani typVolani = getTyp(parametry);
 		Connection connection = ziskejSpojeni();
 
 		if (jeAktivniTransakce()) {
 			for (SqlChecker i : getAktivniTransakce().interceptory) {
-				if (!i.moznoSpustit(connection, sql, parametry)) {
+				if (!i.moznoSpustit(this, sql, parametry)) {
 					return -1;
 				}
 			}
@@ -206,13 +206,13 @@ class SqlHelperImpl implements SqlHelper {
 				zavriJeLiTreba(stmt, connection);
 			}
 		} catch (SQLException e) {
-			getSpravce().handleException(e);
+			getHandler().handleException(e);
 			zrusTransakciPokudExistuje();
 			return -1;
 		}
 	}
 
-	public QueryResult provedDotaz(String sql, Object... parametry) {
+	public QueryResult executeQuery(String sql, Object... parametry) {
 		TypVolani typVolani = getTyp(parametry);
 		Connection connection = ziskejSpojeni();
 		Statement stmt = null;
@@ -242,7 +242,7 @@ class SqlHelperImpl implements SqlHelper {
 							zavriJeLiTreba(fstmt, fc);
 						}
 					} catch (SQLException e) {
-						getSpravce().handleException(e);
+						getHandler().handleException(e);
 						zrusTransakciPokudExistuje();
 						// TODO vracet spis null object
 						return null;
@@ -250,7 +250,7 @@ class SqlHelperImpl implements SqlHelper {
 				}
 			};
 		} catch (SQLException e) {
-			getSpravce().handleException(e);
+			getHandler().handleException(e);
 			zrusTransakciPokudExistuje();
 			// TODO vracet spis null object
 			return null;
@@ -274,7 +274,7 @@ class SqlHelperImpl implements SqlHelper {
 
 	private Connection ziskejSpojeni() {
 		if (!jeAktivniTransakce()) {
-			return connectionProvider.getConnection(getSpravce());
+			return connectionProvider.getConnection(getHandler());
 		} else {
 			return getAktivniTransakce().getConnection();
 		}
@@ -306,10 +306,10 @@ class SqlHelperImpl implements SqlHelper {
 		private Transakce(int vnoreni, SqlChecker... interceptory) {
 			Connection conn = null;
 			try {
-				conn = SqlHelperImpl.this.connectionProvider.getConnection(getSpravce());
+				conn = SqlHelperImpl.this.connectionProvider.getConnection(getHandler());
 				conn.setAutoCommit(false);
 			} catch (SQLException e) {
-				getSpravce().handleException(e);
+				getHandler().handleException(e);
 			}
 			this.interceptory = interceptory;
 			this.vnoreni = vnoreni;
@@ -325,7 +325,7 @@ class SqlHelperImpl implements SqlHelper {
 		}
 	}
 
-	public void ukonciTransakci() {
+	public void commitTransaction() {
 		try {
 			Transakce t = lokalniFrontaTransakci.get().poll();
 			if (t != null) {
@@ -334,15 +334,15 @@ class SqlHelperImpl implements SqlHelper {
 				close(c);
 			}
 		} catch (SQLException e) {
-			getSpravce().handleException(e);
+			getHandler().handleException(e);
 		}
 	}
 
-	public boolean probihaTransakce() {
+	public boolean isTransactionActive() {
 		return !lokalniFrontaTransakci.get().isEmpty();
 	}
 
-	public void zacniTransakci(SqlChecker... interceptory) {
+	public void beginTransaction(SqlChecker... interceptory) {
 		Transakce t = getAktivniTransakce();
 		if (t == null) {
 			t = new Transakce(interceptory);
@@ -366,7 +366,7 @@ class SqlHelperImpl implements SqlHelper {
 				close(c);
 			}
 		} catch (SQLException e) {
-			getSpravce().handleException(e);
+			getHandler().handleException(e);
 		}
 	}
 

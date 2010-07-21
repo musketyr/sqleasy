@@ -37,7 +37,7 @@ public class ResultProcessors {
 	 * @param defaultniHodnota hodnota, ktera bude vracena v nouzovem pripade
 	 * @return objekt kalendare vyjadrujici datum ulozene v databazi
 	 */
-	public static ResultProcessor<Calendar> ziskejKalendar(final String jmenoSloupce, final Calendar defaultniHodnota){
+	public static ResultProcessor<Calendar> getCalendar(final String jmenoSloupce, final Calendar defaultniHodnota){
 		return new ResultProcessor<Calendar>(){
 			public Calendar processResultSet(Iterable<ResultSet> irs) throws SQLException {
 				for (ResultSet rs : irs) {
@@ -63,7 +63,7 @@ public class ResultProcessors {
 	 * 		hodnotu z daneho sloupce prvniho radku jako integer, nebo defaultni hodnotu, 
 	 * 		pokud je vysledek prazdny 
 	 */
-	public static ResultProcessor<Integer> ziskejInteger(final String jmenoSloupce, final int defaultniHodnota){
+	public static ResultProcessor<Integer> getInt(final String jmenoSloupce, final int defaultniHodnota){
 		return new ResultProcessor<Integer>(){
 			public Integer processResultSet(Iterable<ResultSet> irs) throws SQLException {
 				for (ResultSet rs : irs) {
@@ -85,7 +85,7 @@ public class ResultProcessors {
 	 * {@link ResultProcessor#processResultSet(Iterable)} vraci
 	 * logickou hodnotu, zda je vysledek prazdny (neobsahuje zadne radky) ci nikoli
 	 */
-	public static ResultProcessor<Boolean> jePrazdny(){
+	public static ResultProcessor<Boolean> isEmpty(){
 		return new ResultProcessor<Boolean>(){
 			public Boolean processResultSet(Iterable<ResultSet> irs) throws SQLException {
 				for (ResultSet rs : irs) {
@@ -110,7 +110,7 @@ public class ResultProcessors {
 	 * 		hodnotu z daneho sloupce prvniho radku jako instanci tridy <code>T</code>, nebo defaultni hodnotu, 
 	 * 		pokud je vysledek prazdny 
 	 */
-	public static <T> ResultProcessor<T> ziskejObjekt(final String jmenoSloupce, final T defaultniHodnota){
+	public static <T> ResultProcessor<T> getObject(final String jmenoSloupce, final T defaultniHodnota){
 		return new ResultProcessor<T>(){
 			public T processResultSet(Iterable<ResultSet> irs) throws SQLException {
 				for (ResultSet rs : irs) {
@@ -133,7 +133,7 @@ public class ResultProcessors {
 	 * 		hodnotu z prvniho sloupce prvniho radku jako instanci tridy <code>T</code>, nebo defaultni hodnotu, 
 	 * 		pokud je vysledek prazdny 
 	 */
-	public static <T> ResultProcessor<T> vysledek(Class<T> trida){
+	public static <T> ResultProcessor<T> first(Class<T> trida){
 		return new ResultProcessor<T>(){
 			public T processResultSet(Iterable<ResultSet> irs) throws SQLException {
 				for (ResultSet rs : irs) {
@@ -155,7 +155,7 @@ public class ResultProcessors {
 	 * 		seznam hodnot z daneho sloupce jako instanci seznamu s paramterem tridy <code>T</code>, nebo prazdny seznam, 
 	 * 		pokud je vysledek prazdny 
 	 */
-	public static <T> ResultProcessor<List<T>> ziskejSeznamObjektu(final String jmenoSloupce, final Class<T> tridaObjektu){
+	public static <T> ResultProcessor<List<T>> getList(final String jmenoSloupce, final Class<T> tridaObjektu){
 		return new ResultProcessor<List<T>>(){
 			@SuppressWarnings("unchecked")
 			public List<T> processResultSet(Iterable<ResultSet> irs) throws SQLException {
@@ -185,7 +185,7 @@ public class ResultProcessors {
 	 * 		seznam hodnot z daneho sloupce jako instanci seznamu s paramterem tridy <code>T</code>, nebo prazdny seznam, 
 	 * 		pokud je vysledek prazdny 
 	 */
-	public static <T> ResultProcessor<List<T>> ziskejSeznamObjektu(final Class<T> tridaObjektu){
+	public static <T> ResultProcessor<List<T>> getList(final Class<T> tridaObjektu){
 		return new ResultProcessor<List<T>>(){
 			public List<T> processResultSet(Iterable<ResultSet> irs) throws SQLException {
 				List<T> list = new ArrayList<T>();
@@ -208,7 +208,7 @@ public class ResultProcessors {
 	 * @return mapu tvorenou klici z prvniho sloupce a hodnotami z druheho sloupce, nebo prazdnou mapu
 	 * pokud je vysledek prazdny
 	 */
-	public static <K, V> ResultProcessor<Map<K,V>> ziskejMapu(Class<K> keyClass, Class<V> valueClass){
+	public static <K, V> ResultProcessor<Map<K,V>> getMap(Class<K> keyClass, Class<V> valueClass){
 		return new ResultProcessor<Map<K,V>>(){
 			public Map<K, V> processResultSet(Iterable<ResultSet> irs)
 					throws SQLException {
@@ -219,6 +219,36 @@ public class ResultProcessors {
 					ret.put(key, value);
 				}
 				return Collections.unmodifiableMap(ret);
+			}
+		};
+	}
+	
+	public static ResultProcessor<String> print(){
+		return new ResultProcessor<String>(){
+			public String processResultSet(Iterable<ResultSet> irs) throws SQLException {
+				StringBuilder sb = new StringBuilder();
+				for (ResultSet rs : irs) {
+					int columnCount = rs.getMetaData().getColumnCount();
+					for (int i = 0; i < columnCount; i++) {
+						sb.append(rs.getMetaData().getColumnName(i + 1));
+						if (i < columnCount) {
+							sb.append(" ~ ");
+						}
+					}
+					sb.append("\n");
+					break;
+				}
+				for (ResultSet rs : irs) {
+					int columnCount = rs.getMetaData().getColumnCount();
+					for (int i = 0; i < columnCount; i++) {
+						sb.append("" + rs.getObject(i + 1));
+						if (i < columnCount) {
+							sb.append(" ~ ");
+						}
+					}
+					sb.append("\n");
+				}
+				return sb.toString();
 			}
 		};
 	}

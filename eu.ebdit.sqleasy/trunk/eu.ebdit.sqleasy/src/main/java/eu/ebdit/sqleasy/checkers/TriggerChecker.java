@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import eu.ebdit.sqleasy.SqlEasy;
+import eu.ebdit.sqleasy.SqlHelper;
 
 /**
  * Kontrolor, ktery hlida, aby nebyly mazany triggery, ktere neexistuji,
@@ -16,7 +17,7 @@ import eu.ebdit.sqleasy.SqlEasy;
  * @author Vladimir Orany
  *
  */
-public enum TriggerKontrolor implements SqlChecker {
+public enum TriggerChecker implements SqlChecker {
 	/**
 	 * Kontrolor, ktery hlida, aby se nikdo nepokousel vymazat trigger,
 	 * ktery neexistuje.
@@ -75,9 +76,9 @@ public enum TriggerKontrolor implements SqlChecker {
 		@Override public String toString() { return "Kontrolor tvorby triggeru"; }
 	};
 	
-	protected static Logger log = Logger.getLogger(TriggerKontrolor.class);
+	protected static Logger log = Logger.getLogger(TriggerChecker.class);
 	
-	public boolean moznoSpustit(Connection c, String sql,
+	public boolean moznoSpustit(SqlHelper helper, String sql,
 			Object... parametry) {
 		if (parametry != null && parametry.length > 0) {
 			// tohle jeste zpracovat neumime
@@ -88,7 +89,7 @@ public enum TriggerKontrolor implements SqlChecker {
 		if (jmenoTriggeru == null) {
 			return true;
 		}
-		return muzeSpustitInternal(c,jmenoTriggeru);
+		return muzeSpustitInternal(helper,jmenoTriggeru);
 	}
 	
 	abstract String getJmenoTriggeru(String sql);

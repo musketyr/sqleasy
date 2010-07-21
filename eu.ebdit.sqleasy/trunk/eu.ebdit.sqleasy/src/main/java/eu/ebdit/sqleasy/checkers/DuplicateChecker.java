@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import com.sun.xml.internal.ws.util.StringUtils;
 
 import eu.ebdit.sqleasy.SqlEasy;
+import eu.ebdit.sqleasy.SqlHelper;
 
 /**
  * Kontrolor, ktery testuje, aby se do databaze nevkladali duplicitni hodnoty.
@@ -22,14 +23,14 @@ import eu.ebdit.sqleasy.SqlEasy;
  * @author Vladimir Orany
  *
  */
-public enum DuplikatyKontrolor implements SqlChecker {
+public enum DuplicateChecker implements SqlChecker {
 	
 	/**
 	 * Zakladni instance kontroloru testuje, aby nebyly vkladany duplicitni radky do databaze.
 	 */
 	INSERT {
 		
-		public boolean moznoSpustit(Connection c, String sql, Object... parametry) {
+		public boolean moznoSpustit(SqlHelper helper, String sql, Object... parametry) {
 			if (parametry != null && parametry.length > 0) {
 				// tohle jeste zpracovat neumime
 				return true;
@@ -42,14 +43,14 @@ public enum DuplikatyKontrolor implements SqlChecker {
 				String tabulka = m.group(1);
 				String[] hodnoty = m.group(2).split(",");
 				try {
-					String testSelect = getTestSelectInsert(c, tabulka, hodnoty, SqlEasy.getJmenaSloupcu(c, tabulka));
+					String testSelect = getTestSelectInsert(helper, tabulka, hodnoty, SqlEasy.getJmenaSloupcu(helper, tabulka));
 					if (testSelect == null) {
 						// z nejakeho duvodu se nepodarilo vytvorit select, musim sql pustit k dalsimu zpracovani
 						return true;
 					}
 					Statement stmt = null;
 					try {
-						stmt = c.createStatement();
+						stmt = helper.createStatement();
 						ResultSet rs = stmt.executeQuery(testSelect);
 						while (rs.next()) {
 							// radek jiz exituje
@@ -60,7 +61,7 @@ public enum DuplikatyKontrolor implements SqlChecker {
 						SqlEasy.uzavri(stmt);
 					}
 				} catch (SQLException e) {
-					Logger.getLogger(DuplikatyKontrolor.class).error("Chyba pri zjistovani duplicty",e);
+					Logger.getLogger(DuplicateChecker.class).error("Chyba pri zjistovani duplicty",e);
 					return true;
 				}
 			}
@@ -70,7 +71,7 @@ public enum DuplikatyKontrolor implements SqlChecker {
 
 		private String getTestSelectInsert(Connection c, String tabulka, String[] hodnoty, List<String> skutecneSloupce) {
 			if (hodnoty.length != skutecneSloupce.size()) {
-				Logger.getLogger(DuplikatyKontrolor.class).warn("rozdilny pocet hodnot a sloupcu, nekde se stala chyba!!!");
+				Logger.getLogger(DuplicateChecker.class).warn("rozdilny pocet hodnot a sloupcu, nekde se stala chyba!!!");
 				return null;
 			}
 			
@@ -94,7 +95,7 @@ public enum DuplikatyKontrolor implements SqlChecker {
 	},
 	
 	INDEX {
-		public boolean moznoSpustit(Connection c, String sql, Object... parametry) {
+		public boolean moznoSpustit(SqlHelper helper, String sql, Object... parametry) {
 			if (parametry != null && parametry.length > 0) {
 				// tohle jeste zpracovat neumime
 				return true;
@@ -111,7 +112,7 @@ public enum DuplikatyKontrolor implements SqlChecker {
 				try {
 					Statement stmt = null;
 					try {
-						stmt = c.createStatement();
+						stmt = helper.createStatement();
 						ResultSet rs = stmt.executeQuery(sb.toString());
 						while (rs.next()) {
 							// radek jiz exituje
@@ -122,7 +123,7 @@ public enum DuplikatyKontrolor implements SqlChecker {
 						SqlEasy.uzavri(stmt);
 					}
 				} catch (SQLException e) {
-					Logger.getLogger(DuplikatyKontrolor.class).error("Chyba pri zjistovani duplicty",e);
+					Logger.getLogger(DuplicateChecker.class).error("Chyba pri zjistovani duplicty",e);
 					return true;
 				}
 			}

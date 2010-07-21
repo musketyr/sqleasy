@@ -1,6 +1,5 @@
 package eu.ebdit.sqleasy.checkers;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import eu.ebdit.sqleasy.SqlEasy;
+import eu.ebdit.sqleasy.SqlHelper;
 
 
 /**
@@ -16,7 +16,7 @@ import eu.ebdit.sqleasy.SqlEasy;
  * @author Vladimir Orany
  *
  */
-public enum SloupceKontrolor implements SqlChecker {
+public enum ColumnChecker implements SqlChecker {
 
 	
 	/**
@@ -28,9 +28,9 @@ public enum SloupceKontrolor implements SqlChecker {
 		
 	} ;
 
-	Logger log = Logger.getLogger(SloupceKontrolor.class);
+	Logger log = Logger.getLogger(ColumnChecker.class);
 	
-	public boolean moznoSpustit(Connection c, String sql,
+	public boolean moznoSpustit(SqlHelper helper, String sql,
 			Object... parametry) {
 		if (parametry != null && parametry.length > 0) {
 			// tohle jeste zpracovat neumime
@@ -57,7 +57,7 @@ public enum SloupceKontrolor implements SqlChecker {
 				}
 			}
 			try {
-				List<String> skutecneSloupce = SqlEasy.getJmenaSloupcu(c, tabulka);
+				List<String> skutecneSloupce = SqlEasy.getJmenaSloupcu(helper, tabulka);
 				int pocetSloupcu = skutecneSloupce.size();
 				skutecneSloupce.removeAll(sloupce);
 				return skutecneSloupce.size() == pocetSloupcu;

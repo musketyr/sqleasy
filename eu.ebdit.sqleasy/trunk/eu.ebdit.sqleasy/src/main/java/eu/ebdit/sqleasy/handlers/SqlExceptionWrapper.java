@@ -1,4 +1,4 @@
-package eu.ebdit.sqleasy;
+package eu.ebdit.sqleasy.handlers;
 
 import java.sql.SQLException;
 
@@ -9,8 +9,13 @@ import java.sql.SQLException;
  * @author Vladimir Orany
  *
  */
-class SqlExceptionWrapper extends RuntimeException {
+public class SqlExceptionWrapper extends RuntimeException {
 
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3992025180745712013L;
 
 	/**
 	 * Vytvori novou obalovou vyjimku

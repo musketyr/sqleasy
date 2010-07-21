@@ -10,6 +10,9 @@ public final class ExceptionHandlers {
 		return StackTraceExceptionHandler.INSTANCE;
 	}
 	
+	public static ExceptionHandler wrappringExceptionHandler(){
+		return WrappingExceptionHandler.INSTANCE;
+	}
 
 	public static ExceptionHandler nullSafe(ExceptionHandler handler) {
 		return handler == null ? ExceptionHandlers.defaultHandler() : handler;

@@ -27,34 +27,34 @@ public interface SqlHelper {
 	 * @param kontrolori kontrolori, ktere budou posuzovat spravnost spoustenych sql prikazu
 	 * @throws ApplicationException pokud dojde k chybe pri tvoreni transakce
 	 */
-	void zacniTransakci(SqlChecker... interceptory);
+	void beginTransaction(SqlChecker... interceptory);
 	
 	/**
 	 * Zjisti, zda prave probiha nejaka transakce. 
 	 * @return <code>true</code> pokud nejaka transakce probiha
 	 * @throws ApplicationException	pokud dojde k chybe pri zjistovani stavu transakce
 	 */
-	boolean probihaTransakce();
+	boolean isTransactionActive();
 	
 	/**
 	 * Potvrdi zmeny provedene behem transakce a ukonci aktualni transakci. 
 	 * @throws ApplicationException pokud se nepodari transakci odeslat
 	 * @throws NullPointerException pokud jiz zadna transakce neprobiha
 	 */
-	void ukonciTransakci();
+	void commitTransaction();
 	
 	/**
 	 * Vrati spravce vyjimek. Hodnota musi byt vzdy nenullova, misto vraceni <code>null</code>
 	 * musi implementatori vracet {@link  ExceptionHandlers#defaultHandler()}.
 	 * @return spravce vyjimek
 	 */
-	ExceptionHandler getSpravce();
+	ExceptionHandler getHandler();
 	
 	/**
 	 * Nastavi noveho spravce vyjimek.
 	 * @param handler novy spravce vyjimek
 	 */
-	void setSpravce(ExceptionHandler handler);
+	void setHandler(ExceptionHandler handler);
 	
 	/**
 	 * Provede SQL dotaz a vrati vysledek jako instanci rozhrani {@link QueryResult}.
@@ -65,7 +65,7 @@ public interface SqlHelper {
 	 * @return	vysledek dotazu jako instanci implementujici rozhrani {@link QueryResult}
 	 * @throws ApplicationException pokud dojde k chybe pri praci s databazi
 	 */
-	QueryResult provedDotaz(String sql, Object... parametry);
+	QueryResult executeQuery(String sql, Object... parametry);
 	
 	/**
 	 * Provede SQL aktualizaci a vrati pocet ovlivnenych radku.
@@ -76,6 +76,6 @@ public interface SqlHelper {
 	 * @return	pocet radku ovlivnenych aktualizaci
 	 * @throws ApplicationException pokud dojde k chybe pri praci s databazi
 	 */
-	int provedAktualizaci(String sql, Object... parametry);
+	int execute(String sql, Object... parametry);
 	
 }

@@ -15,7 +15,7 @@ import java.sql.SQLException;
  * @author Vladimir Orany
  *
  * @param <T> trida objektu, ktery ma vracet metoda {@link #processResultSet(Iterable)}
- * @see SqlHelper#provedDotaz(String, Object...)
+ * @see SqlHelper#executeQuery(String, Object...)
  * @see QueryResult#processWith(IZpracovaniVysledku)
  */
 public interface ResultProcessor<T>  {

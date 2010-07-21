@@ -6,7 +6,7 @@ package eu.ebdit.sqleasy;
  * z vysledku pouzijte metodu {@link #processWith(ResultProcessor)}
  * s prislusnym objektem implementujici rozhrani {@link ResultProcessor}.
  * @author Vladimir Orany
- * @see SqlHelper#provedDotaz(String, Object...)
+ * @see SqlHelper#executeQuery(String, Object...)
  * @see ResultProcessor#processResultSet(Iterable)
  */
 public interface QueryResult {
