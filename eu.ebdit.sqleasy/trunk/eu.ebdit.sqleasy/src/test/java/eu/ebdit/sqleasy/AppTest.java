@@ -1,4 +1,4 @@
-package eu.ebdit.easyjdbc;
+package eu.ebdit.sqleasy;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

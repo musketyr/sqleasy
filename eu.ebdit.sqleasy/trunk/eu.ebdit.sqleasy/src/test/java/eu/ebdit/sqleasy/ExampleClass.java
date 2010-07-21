@@ -1,4 +1,4 @@
-package eu.ebdit.easyjdbc;
+package eu.ebdit.sqleasy;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -48,9 +48,10 @@ public class ExampleClass {
 		
 		String bla = helper.executeQuery("SELECT BLA FROM TABLE WHERE ID=?", 1)
 			.processWith(ResultProcessors.first(String.class));
-		
+		System.out.println(bla);
 		MyFancyObject obj = helper.executeQuery("SELECT JMENO, PRIJMENI, BLA FROM FANCY WHERE ID = ?", 5)
 			.processWith(MyFancyObjectProcessor.INSTANCE);
+		System.out.println(obj);
 	}
 	
 }
