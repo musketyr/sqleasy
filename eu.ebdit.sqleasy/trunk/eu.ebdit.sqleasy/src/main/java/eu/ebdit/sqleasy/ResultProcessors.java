@@ -133,7 +133,7 @@ public class ResultProcessors {
 	 * 		hodnotu z prvniho sloupce prvniho radku jako instanci tridy <code>T</code>, nebo defaultni hodnotu, 
 	 * 		pokud je vysledek prazdny 
 	 */
-	public static <T> ResultProcessor<T> first(Class<T> trida){
+	public static <T> ResultProcessor<T> singleResult(Class<T> trida){
 		return new ResultProcessor<T>(){
 			public T processResultSet(Iterable<ResultSet> irs) throws SQLException {
 				for (ResultSet rs : irs) {
