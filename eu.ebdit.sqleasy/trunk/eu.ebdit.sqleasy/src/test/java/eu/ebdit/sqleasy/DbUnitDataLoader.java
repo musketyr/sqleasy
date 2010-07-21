@@ -12,6 +12,11 @@ import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.operation.DatabaseOperation;
 import org.hibernate.ejb.HibernateEntityManager;
 
+import eu.ebdit.sqleasy.cp.ConnectionProvider;
+import eu.ebdit.sqleasy.cp.ConnectionProviders;
+import eu.ebdit.sqleasy.handlers.ExceptionHandler;
+import eu.ebdit.sqleasy.handlers.ExceptionHandlers;
+
 /**
  * Loads test data in the form of DbUnit XML into a database.
  * 
@@ -22,7 +27,7 @@ public class DbUnitDataLoader
     private InputStream testData;
     private Connection connection;
 
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("sqleasy-test-test");
+	private ConnectionProvider connectionProvider;
     
     public DbUnitDataLoader(InputStream testData, Connection connection)
     {
@@ -49,11 +54,11 @@ public class DbUnitDataLoader
 
     public void setUp() throws Exception
     {
-        InputStream testData = UserTest.class.getResourceAsStream("/user.db.xml");
+        InputStream testData = DbUnitDataLoader.class.getResourceAsStream("/user.db.xml");
 
-        HibernateEntityManager em = (HibernateEntityManager) emf.createEntityManager();
+        connectionProvider = ConnectionProviders.usingDriverManager("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:my-project-test", "sa", "");
 
-        DbUnitDataLoader loader = new DbUnitDataLoader(testData, em.getSession().connection());
+        DbUnitDataLoader loader = new DbUnitDataLoader(testData, connectionProvider.getConnection(ExceptionHandlers.stackTraceHandler()));
 
         loader.populateTestData();
     }
