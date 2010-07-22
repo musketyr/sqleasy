@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+	<TABULKA ID="1" JMENO="-t-1" PRIJMENI="t- testovaci 1" BLA="blaaaaah1"/>
+	<TABULKA ID="2" JMENO="-t-2" PRIJMENI="t- testovaci 2" BLA="blaaaaah2"/>
+	<TABULKA ID="3" JMENO="-t-3" PRIJMENI="t- testovaci 3" BLA="blaaaaah3"/>
+</dataset>

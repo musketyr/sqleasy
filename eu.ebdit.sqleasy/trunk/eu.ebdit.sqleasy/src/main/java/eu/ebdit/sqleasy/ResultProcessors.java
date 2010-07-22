@@ -227,19 +227,19 @@ public class ResultProcessors {
 		return new ResultProcessor<String>(){
 			public String processResultSet(Iterable<ResultSet> irs) throws SQLException {
 				StringBuilder sb = new StringBuilder();
+				boolean first = true;
 				for (ResultSet rs : irs) {
 					int columnCount = rs.getMetaData().getColumnCount();
-					for (int i = 0; i < columnCount; i++) {
-						sb.append(rs.getMetaData().getColumnName(i + 1));
-						if (i < columnCount) {
-							sb.append(" ~ ");
+					if (first) {
+						for (int i = 0; i < columnCount; i++) {
+							sb.append(rs.getMetaData().getColumnName(i + 1));
+							if (i < columnCount) {
+								sb.append(" ~ ");
+							}
 						}
+						sb.append("\n");
+						first = false;
 					}
-					sb.append("\n");
-					break;
-				}
-				for (ResultSet rs : irs) {
-					int columnCount = rs.getMetaData().getColumnCount();
 					for (int i = 0; i < columnCount; i++) {
 						sb.append("" + rs.getObject(i + 1));
 						if (i < columnCount) {

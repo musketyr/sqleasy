@@ -3,12 +3,7 @@ package eu.ebdit.sqleasy;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import eu.ebdit.sqleasy.ResultProcessor;
-import eu.ebdit.sqleasy.ResultProcessors;
-import eu.ebdit.sqleasy.SqlEasy;
-import eu.ebdit.sqleasy.SqlHelper;
 import eu.ebdit.sqleasy.cp.ConnectionProvider;
-import eu.ebdit.sqleasy.cp.ConnectionProviders;
 import eu.ebdit.sqleasy.handlers.ExceptionHandlers;
 
 public class ExampleClass {
@@ -32,24 +27,56 @@ public class ExampleClass {
 
 	public static class MyFancyObject {
 
-		public void setJmeno(String string) {}
-
-		public void setPrijmeni(String string) {}
-
-		public void setBla(String string) {}
+		private String jmeno;
+		private String prijmeni;
+		private String bla;
+		
+		public String getJmeno() {
+			return jmeno;
+		}
+		public void setJmeno(String jmeno) {
+			this.jmeno = jmeno;
+		}
+		public String getBla() {
+			return bla;
+		}
+		public void setBla(String bla) {
+			this.bla = bla;
+		}
+		public String getPrijmeni() {
+			return prijmeni;
+		}
+		public void setPrijmeni(String prijmeni) {
+			this.prijmeni = prijmeni;
+		}
+		@Override
+		public String toString() {
+			return "MyFancyObject [jmeno=" + jmeno + ", prijmeni=" + prijmeni
+					+ ", bla=" + bla + "]";
+		}
+		
+		
+		
+		 
 
 	}
 
-	public static void main(String[] args) {
-		// tohle by mohl delat supplier
-		ConnectionProvider provider = ConnectionProviders.forConnection(null);
+	public static void main(String[] args) throws Exception {
+		DbUnitDataLoader.populateTestData();
+		ConnectionProvider provider = DbUnitDataLoader.getConnectionProvider();
+		
 		SqlHelper helper = SqlEasy.getHelper(provider);
 		helper.setHandler(ExceptionHandlers.stackTraceHandler());
 		
-		String bla = helper.executeQuery("SELECT BLA FROM TABLE WHERE ID=?", 1)
+		
+		String content = helper.executeQuery("SELECT * FROM TABULKA").processWith(ResultProcessors.print());
+		System.out.println(content);
+		
+		String bla = helper.executeQuery("SELECT BLA FROM TABULKA WHERE ID=?", 1)
 			.processWith(ResultProcessors.singleResult(String.class));
 		System.out.println(bla);
-		MyFancyObject obj = helper.executeQuery("SELECT JMENO, PRIJMENI, BLA FROM FANCY WHERE ID = ?", 5)
+		
+		MyFancyObject obj = helper.executeQuery("SELECT JMENO, PRIJMENI, BLA FROM TABULKA WHERE ID = ?", 3)
 			.processWith(MyFancyObjectProcessor.INSTANCE);
 		System.out.println(obj);
 	}
