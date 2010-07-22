@@ -14,15 +14,13 @@ final class DirectConnectionProvider implements ConnectionProvider{
 		this.closeAutomatically = cloaseAutomatically;
 	}
 	
-	@Override
 	public Connection getConnection(ExceptionHandler handler) {
-		return connection;
+		return this.connection;
 	}
 	
-	@Override
-	public void closeConnection(Connection connection, ExceptionHandler handler) {
-		if (closeAutomatically) {
-			ConnectionProviders.close(connection, handler);
+	public void closeConnection(Connection conn, ExceptionHandler handler) {
+		if (this.closeAutomatically) {
+			ConnectionProviders.close(conn, handler);
 		}
 	}
 	

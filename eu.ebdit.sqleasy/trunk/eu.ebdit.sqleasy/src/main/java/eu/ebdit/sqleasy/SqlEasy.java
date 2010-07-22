@@ -11,7 +11,7 @@ import eu.ebdit.sqleasy.handlers.ExceptionHandler;
  */
 public final class SqlEasy {
 	
-	private SqlEasy() {}
+	private SqlEasy() { /* library class */}
 	
 	
 	/**

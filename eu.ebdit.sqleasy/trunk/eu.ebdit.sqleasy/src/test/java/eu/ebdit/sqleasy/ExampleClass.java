@@ -14,7 +14,7 @@ public class ExampleClass {
 			ResultProcessor<MyFancyObject> {
 		INSTANCE;
 		
-		@Override public MyFancyObject processResultSet(Iterable<ResultSet> irs)
+		public MyFancyObject processResultSet(Iterable<ResultSet> irs)
 				throws SQLException {
 			for (ResultSet rs : irs) {
 				MyFancyObject myf = new MyFancyObject();
@@ -34,27 +34,27 @@ public class ExampleClass {
 		private String bla;
 		
 		public String getJmeno() {
-			return jmeno;
+			return this.jmeno;
 		}
 		public void setJmeno(String jmeno) {
 			this.jmeno = jmeno;
 		}
 		public String getBla() {
-			return bla;
+			return this.bla;
 		}
 		public void setBla(String bla) {
 			this.bla = bla;
 		}
 		public String getPrijmeni() {
-			return prijmeni;
+			return this.prijmeni;
 		}
 		public void setPrijmeni(String prijmeni) {
 			this.prijmeni = prijmeni;
 		}
 		@Override
 		public String toString() {
-			return "MyFancyObject [jmeno=" + jmeno + ", prijmeni=" + prijmeni
-					+ ", bla=" + bla + "]";
+			return "MyFancyObject [jmeno=" + this.jmeno + ", prijmeni=" + this.prijmeni
+					+ ", bla=" + this.bla + "]";
 		}
 		
 		
@@ -74,11 +74,11 @@ public class ExampleClass {
 		String content = helper.executeQuery("SELECT * FROM TABULKA").processWith(ResultProcessors.print());
 		System.out.println(content);
 		
-		String bla = helper.executeQuery("SELECT BLA FROM TABULKA WHERE ID=?", 1)
+		String bla = helper.executeQuery("SELECT BLA FROM TABULKA WHERE ID=?", Integer.valueOf(1))
 			.processWith(ResultProcessors.singleResult(String.class));
 		System.out.println(bla);
 		
-		MyFancyObject obj = helper.executeQuery("SELECT JMENO, PRIJMENI, BLA FROM TABULKA WHERE ID = ?", 3)
+		MyFancyObject obj = helper.executeQuery("SELECT JMENO, PRIJMENI, BLA FROM TABULKA WHERE ID = ?", Integer.valueOf(3))
 			.processWith(MyFancyObjectProcessor.INSTANCE);
 		System.out.println(obj);
 		

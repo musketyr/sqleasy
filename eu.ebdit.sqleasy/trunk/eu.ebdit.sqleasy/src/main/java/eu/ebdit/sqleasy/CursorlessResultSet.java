@@ -37,7 +37,7 @@ class CursorlessResultSet extends ResultSetWrapper {
 	 * metody, ktere by mohli zmenit kurzor.
 	 * @param wrapped
 	 */
-	CursorlessResultSet(ResultSet wrapped) {
+	CursorlessResultSet(final ResultSet wrapped) {
 		super(wrapped);
 	}
 
@@ -82,7 +82,7 @@ class CursorlessResultSet extends ResultSetWrapper {
 	}
 
 	@Override
-	public boolean absolute(int arg0) throws SQLException {
+	public boolean absolute(final int arg0) throws SQLException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -107,17 +107,17 @@ class CursorlessResultSet extends ResultSetWrapper {
 	}
 
 	@Override
-	public boolean relative(int arg0) throws SQLException {
+	public boolean relative(final int arg0) throws SQLException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void setFetchDirection(int arg0) throws SQLException {
+	public void setFetchDirection(final int arg0) throws SQLException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public void setFetchSize(int arg0) throws SQLException {
+	public void setFetchSize(final int arg0) throws SQLException {
 		throw new UnsupportedOperationException();
 	}
 }

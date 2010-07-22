@@ -65,6 +65,7 @@ public class ResultProcessors {
 	 */
 	public static ResultProcessor<Integer> getInt(final String jmenoSloupce, final int defaultniHodnota){
 		return new ResultProcessor<Integer>(){
+			@SuppressWarnings("boxing")
 			public Integer processResultSet(Iterable<ResultSet> irs) throws SQLException {
 				for (ResultSet rs : irs) {
 					Integer i = rs.getInt(jmenoSloupce);
@@ -91,11 +92,11 @@ public class ResultProcessors {
 				for (ResultSet rs : irs) {
 					for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
 						if (rs.getObject(i) != null) {
-							return false;
+							return Boolean.FALSE;
 						}
 					}
 				}
-				return true;
+				return Boolean.TRUE;
 			}
 		};
 	}
@@ -185,7 +186,7 @@ public class ResultProcessors {
 	 * 		seznam hodnot z daneho sloupce jako instanci seznamu s paramterem tridy <code>T</code>, nebo prazdny seznam, 
 	 * 		pokud je vysledek prazdny 
 	 */
-	public static <T> ResultProcessor<List<T>> getList(final Class<T> tridaObjektu){
+	public static <T> ResultProcessor<List<T>> getList(@SuppressWarnings("unused") final Class<T> tridaObjektu){
 		return new ResultProcessor<List<T>>(){
 			public List<T> processResultSet(Iterable<ResultSet> irs) throws SQLException {
 				List<T> list = new ArrayList<T>();

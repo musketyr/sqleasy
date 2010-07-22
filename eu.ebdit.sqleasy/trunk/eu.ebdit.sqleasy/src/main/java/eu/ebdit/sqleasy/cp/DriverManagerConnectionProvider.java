@@ -34,7 +34,7 @@ class DriverManagerConnectionProvider implements ConnectionProvider {
 			this.closeAutomatically = true;
 		} else {
 			Map<String, Object> props = new HashMap<String, Object>(propertiesMap);
-			closeAutomatically = initAutoClose(props);
+			this.closeAutomatically = initAutoClose(props);
 			props.remove(ConnectionProviders.CLOSE_AUTOMATICALLY);
 			this.properties = new Properties();
 			this.properties.putAll(props);
@@ -42,33 +42,31 @@ class DriverManagerConnectionProvider implements ConnectionProvider {
 
 	}
 
-	@Override
 	public Connection getConnection(ExceptionHandler handler) {
 		try {
-			return DriverManager.getConnection(url, properties);
+			return DriverManager.getConnection(this.url, this.properties);
 		} catch (SQLException ex) {
 			handler.handleException(ex);
 			throw new IllegalStateException("Cannot obtain connection!");
 		}
 	}
 	
-	@Override
 	public void closeConnection(Connection connection, ExceptionHandler handler) {
-		if (closeAutomatically) {
+		if (this.closeAutomatically) {
 			ConnectionProviders.close(connection, handler);
 		}
 	}
 
-	private boolean initAutoClose(Map<String, Object> properties) {
+	private boolean initAutoClose(Map<String, Object> props) {
 		boolean ret = false;
-		Object closeAutomatically = properties.get(ConnectionProviders.CLOSE_AUTOMATICALLY);
-		if (closeAutomatically == null) {
+		Object autoClose = props.get(ConnectionProviders.CLOSE_AUTOMATICALLY);
+		if (autoClose == null) {
 			ret = true;
-		} else if (closeAutomatically instanceof Boolean) {
-			Boolean close = (Boolean) closeAutomatically;
+		} else if (autoClose instanceof Boolean) {
+			Boolean close = (Boolean) autoClose;
 			ret = close.booleanValue();
-		} else if (closeAutomatically instanceof String) {
-			String close = (String) closeAutomatically;
+		} else if (autoClose instanceof String) {
+			String close = (String) autoClose;
 			ret = Boolean.valueOf(close).booleanValue();
 		}
 		return ret;

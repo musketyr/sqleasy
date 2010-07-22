@@ -18,19 +18,17 @@ class DirectDataSourceConnectionProvider implements ConnectionProvider {
 		this.closeAutomatically = closeAutomatically;
 	}
 
-	@Override
 	public Connection getConnection(ExceptionHandler handler) {
 		try {
-			return dataSource.getConnection();
+			return this.dataSource.getConnection();
 		} catch (SQLException e) {
 			handler.handleException(e);
 		}
 		throw new IllegalStateException("Cannot obtain connection from datasource!");
 	}
 	
-	@Override
 	public void closeConnection(Connection connection, ExceptionHandler handler) {
-		if (closeAutomatically) {
+		if (this.closeAutomatically) {
 			ConnectionProviders.close(connection, handler);
 		}
 	}

@@ -15,6 +15,6 @@ enum DefaultExceptionHandler implements ExceptionHandler {
 	 */
 	INSTANCE;
 	
-	public void handleException(SQLException e) {}
+	public void handleException(SQLException e) { /* do nothing */}
 
 }

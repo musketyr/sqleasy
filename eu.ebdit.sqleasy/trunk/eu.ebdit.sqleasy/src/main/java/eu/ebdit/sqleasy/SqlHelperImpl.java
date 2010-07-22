@@ -75,9 +75,9 @@ class SqlHelperImpl implements SqlHelper {
 			if (stmt instanceof PreparedStatement) {
 				PreparedStatement ps = (PreparedStatement) stmt;
 				return ps.executeQuery();
-			} else {
-				return stmt.executeQuery(sql);
 			}
+			return stmt.executeQuery(sql);
+			
 		}
 
 		public int provedAkutalizaci(Statement s, String sql)
@@ -100,7 +100,7 @@ class SqlHelperImpl implements SqlHelper {
 		}
 	};
 
-	private final ConnectionProvider connectionProvider;
+	final ConnectionProvider connectionProvider;
 	private ExceptionHandler handler = null;
 
 	/**
@@ -112,7 +112,7 @@ class SqlHelperImpl implements SqlHelper {
 	 */
 	public static final SqlHelper getHelper(ConnectionProvider provider) {
 		SqlHelper h = cache.get(provider);
-		if (h == null) {
+		if (h != null) {
 			h = new SqlHelperImpl(provider);
 			cache.putIfAbsent(provider, h);
 		}
@@ -120,7 +120,7 @@ class SqlHelperImpl implements SqlHelper {
 
 	}
 	
-	private Iterable<ResultSet> asIterable(final ResultSet rs){
+	Iterable<ResultSet> asIterable(final ResultSet rs){
 		
 		final ResultSet wrapped = new CursorlessResultSet(rs);
 		
@@ -169,7 +169,7 @@ class SqlHelperImpl implements SqlHelper {
 	 * @param provider
 	 */
 	private SqlHelperImpl(ConnectionProvider provider) {
-		connectionProvider = provider;
+		this.connectionProvider = provider;
 	}
 
 	public void setHandler(ExceptionHandler handler) {
@@ -177,7 +177,7 @@ class SqlHelperImpl implements SqlHelper {
 	}
 
 	public ExceptionHandler getHandler() {
-		return ExceptionHandlers.nullSafe(handler);
+		return ExceptionHandlers.nullSafe(this.handler);
 	}
 
 	public QueryResult executeInsert(String sql, Object... parametry) {
@@ -255,7 +255,7 @@ class SqlHelperImpl implements SqlHelper {
 		return stmt;
 	}
 
-	private void handleException(SQLException e) {
+	void handleException(SQLException e) {
 		getHandler().handleException(e);
 		zrusTransakciPokudExistuje();
 	}
@@ -300,6 +300,9 @@ class SqlHelperImpl implements SqlHelper {
 		}
 	}
 
+	/**
+	 * @param sql  
+	 */
 	private StatementType getTyp(String sql, Object[] parametry) {
 		if (parametry != null && parametry.length > 0) {
 			return StatementType.PREPARED;
@@ -308,19 +311,18 @@ class SqlHelperImpl implements SqlHelper {
 
 	}
 
-	private void zavriJeLiTreba(Statement stmt, Connection connection) {
+	void zavriJeLiTreba(Statement stmt, Connection connection) {
 		close(stmt);
 		if (!jeAktivniTransakce()) {
-			connectionProvider.closeConnection(connection, getHandler());
+			this.connectionProvider.closeConnection(connection, getHandler());
 		}
 	}
 
 	private Connection ziskejSpojeni() {
 		if (!jeAktivniTransakce()) {
-			return connectionProvider.getConnection(getHandler());
-		} else {
-			return getAktivniTransakce().getConnection();
+			return this.connectionProvider.getConnection(getHandler());
 		}
+		return getAktivniTransakce().getConnection();
 	}
 
 	private Transakce getAktivniTransakce() {
@@ -339,8 +341,8 @@ class SqlHelperImpl implements SqlHelper {
 
 	private class Transakce {
 		private final Connection c;
-		private final int vnoreni;
-		private final SqlChecker[] interceptory;
+		final int vnoreni;
+		final SqlChecker[] interceptory;
 
 		public Transakce(SqlChecker... interceptory) {
 			this(0, interceptory);
@@ -360,11 +362,11 @@ class SqlHelperImpl implements SqlHelper {
 		}
 
 		public Transakce vytvorVnorenou() {
-			return new Transakce(vnoreni + 1, interceptory);
+			return new Transakce(this.vnoreni + 1, this.interceptory);
 		}
 
 		public Connection getConnection() {
-			return c;
+			return this.c;
 		}
 	}
 
@@ -374,7 +376,7 @@ class SqlHelperImpl implements SqlHelper {
 			if (t != null) {
 				Connection c = t.getConnection();
 				c.commit();
-				connectionProvider.closeConnection(c, getHandler());
+				this.connectionProvider.closeConnection(c, getHandler());
 			}
 		} catch (SQLException e) {
 			getHandler().handleException(e);
@@ -406,7 +408,7 @@ class SqlHelperImpl implements SqlHelper {
 			if (t != null) {
 				Connection c = t.getConnection();
 				c.rollback();
-				connectionProvider.closeConnection(c, getHandler());
+				this.connectionProvider.closeConnection(c, getHandler());
 			}
 		} catch (SQLException e) {
 			getHandler().handleException(e);

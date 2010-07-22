@@ -18,7 +18,6 @@ public interface QueryResult {
 	 * @param <T>	trida pozadovaneho objektu
 	 * @param zpracovani objekt, ktery je zodpovedny za zpracovani vysledku sql dotazu
 	 * @return	objekt pozadovaneho typu <code>T</code> odpovidajici datum ziskanych z databaze
-	 * @throws ApplicationException pokud dojde k chybe pri praci s databazi
 	 * @throws IllegalStateException pokud je metoda volana vicekrat nez jednou
 	 */
 	<T> T processWith(ResultProcessor<T> zpracovani);
