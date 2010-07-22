@@ -1,7 +1,10 @@
-package eu.ebdit.sqleasy;
+package eu.ebdit.sqleasy.processors;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import eu.ebdit.sqleasy.QueryResult;
+import eu.ebdit.sqleasy.SqlHelper;
 
 
 /**

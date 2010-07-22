@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 import eu.ebdit.sqleasy.cp.ConnectionProvider;
 import eu.ebdit.sqleasy.handlers.ExceptionHandlers;
+import eu.ebdit.sqleasy.processors.ResultProcessor;
+import eu.ebdit.sqleasy.processors.ResultProcessors;
 
 public class ExampleClass {
 
@@ -79,6 +81,11 @@ public class ExampleClass {
 		MyFancyObject obj = helper.executeQuery("SELECT JMENO, PRIJMENI, BLA FROM TABULKA WHERE ID = ?", 3)
 			.processWith(MyFancyObjectProcessor.INSTANCE);
 		System.out.println(obj);
+		
+		// not supported by HSQLDB
+//		int id = helper.executeInsert("INSERT INTO TABULKA(JMENO, PRIJMENI, BLA) VALUES (?,?,?)", "JMENO", "PRIJMENI", "BLA")
+//			.processWith(ResultProcessors.singleResult(Integer.class));
+//		System.out.println(id);
 	}
 	
 }

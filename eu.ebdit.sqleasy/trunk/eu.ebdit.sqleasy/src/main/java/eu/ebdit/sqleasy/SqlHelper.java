@@ -78,4 +78,13 @@ public interface SqlHelper {
 	 */
 	int execute(String sql, Object... parametry);
 	
+	/**
+	 * Provede insert a vrati automaticky generovane klice. Tato funkce nemusi byt podprorovana
+	 * databazi. V pripade problemu pouzijte {@link #execute(String, Object...)}.
+	 * @param sql
+	 * @param parametry
+	 * @return 
+	 */
+	QueryResult executeInsert(String sql, Object... parametry);
+	
 }

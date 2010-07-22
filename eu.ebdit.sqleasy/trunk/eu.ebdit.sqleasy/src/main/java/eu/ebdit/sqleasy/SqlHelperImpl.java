@@ -15,6 +15,7 @@ import eu.ebdit.sqleasy.checkers.SqlChecker;
 import eu.ebdit.sqleasy.cp.ConnectionProvider;
 import eu.ebdit.sqleasy.handlers.ExceptionHandler;
 import eu.ebdit.sqleasy.handlers.ExceptionHandlers;
+import eu.ebdit.sqleasy.processors.ResultProcessor;
 
 /**
  * Zakladni implementace rozhrani {@link SqlHelper}. Provadi sql dotazy aniz by
@@ -26,22 +27,29 @@ import eu.ebdit.sqleasy.handlers.ExceptionHandlers;
  */
 class SqlHelperImpl implements SqlHelper {
 
-	private static enum TypVolani {
-		NORMALNI {
+	private static enum StatementType {
+		NORMAL {
 			@Override
 			public Statement novyStatement(Connection arg0, String sql)
 					throws SQLException {
 				return arg0.createStatement();
 			}
 		},
-		PRIPRAVENY {
+		PREPARED {
 			@Override
 			public Statement novyStatement(Connection arg0, String sql)
 					throws SQLException {
 				return arg0.prepareStatement(sql);
 			}
 		},
-		VOLATELNY {
+		PREPARED_FOR_INSERT {
+			@Override
+			public Statement novyStatement(Connection arg0, String sql)
+					throws SQLException {
+				return arg0.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			}
+		},
+		CALLABLE {
 			@Override
 			public Statement novyStatement(Connection arg0, String sql)
 					throws SQLException {
@@ -172,9 +180,51 @@ class SqlHelperImpl implements SqlHelper {
 		return ExceptionHandlers.nullSafe(handler);
 	}
 
-	public int execute(String sql, Object... parametry) {
-		TypVolani typVolani = getTyp(parametry);
+	public QueryResult executeInsert(String sql, Object... parametry) {
+		StatementType typVolani = StatementType.PREPARED_FOR_INSERT;
 		Connection connection = ziskejSpojeni();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+
+		try {
+			stmt = (PreparedStatement) prepareStatement(sql, typVolani, connection, parametry);
+			typVolani.provedAkutalizaci(stmt, sql);
+			rs = stmt.getGeneratedKeys();
+			final ResultSet frs = rs;
+			final Statement fstmt = stmt;
+			final Connection fc = connection;
+			return new QueryResult() {
+				public <T> T processWith(ResultProcessor<T> zpracovani) {
+					try {
+						// if (frs.isClosed()) {
+						// throw new
+						// IllegalStateException("Metoda zpracuj nemuze byt volana vicekrat nez jednou!");
+						// }
+						try {
+							T t = zpracovani.processResultSet(asIterable(frs));
+							return t;
+						} finally {
+							if (frs != null) {
+								frs.close();
+							}
+							zavriJeLiTreba(fstmt, fc);
+						}
+					} catch (SQLException e) {
+						handleException(e);
+						return null;
+					}
+				}
+			};
+		} catch (SQLException e) {
+			handleException(e);
+			return null;
+		}
+	}
+	
+	public int execute(String sql, Object... parametry) {
+		StatementType typVolani = getTyp(sql, parametry);
+		Connection connection = ziskejSpojeni();
+		Statement stmt = null;
 
 		if (jeAktivniTransakce()) {
 			for (SqlChecker i : getAktivniTransakce().interceptory) {
@@ -184,32 +234,40 @@ class SqlHelperImpl implements SqlHelper {
 			}
 		}
 
-		Statement stmt = null;
 
 		try {
 			try {
-				stmt = typVolani.novyStatement(connection, sql);
-				typVolani.pripravStatement(stmt, parametry);
+				stmt = prepareStatement(sql, typVolani, connection, parametry);
 				return typVolani.provedAkutalizaci(stmt, sql);
 			} finally {
 				zavriJeLiTreba(stmt, connection);
 			}
 		} catch (SQLException e) {
-			getHandler().handleException(e);
-			zrusTransakciPokudExistuje();
+			handleException(e);
 			return -1;
 		}
 	}
 
+	private Statement prepareStatement(String sql, StatementType typVolani,
+			Connection connection, Object... parametry) throws SQLException {
+		Statement stmt = typVolani.novyStatement(connection, sql);
+		typVolani.pripravStatement(stmt, parametry);
+		return stmt;
+	}
+
+	private void handleException(SQLException e) {
+		getHandler().handleException(e);
+		zrusTransakciPokudExistuje();
+	}
+
 	public QueryResult executeQuery(String sql, Object... parametry) {
-		TypVolani typVolani = getTyp(parametry);
+		StatementType typVolani = getTyp(sql, parametry);
 		Connection connection = ziskejSpojeni();
 		Statement stmt = null;
 		ResultSet rs = null;
 
 		try {
-			stmt = typVolani.novyStatement(connection, sql);
-			typVolani.pripravStatement(stmt, parametry);
+			stmt = prepareStatement(sql, typVolani, connection, parametry);
 			rs = typVolani.provedDotaz(stmt, sql);
 			final ResultSet frs = rs;
 			final Statement fstmt = stmt;
@@ -231,26 +289,22 @@ class SqlHelperImpl implements SqlHelper {
 							zavriJeLiTreba(fstmt, fc);
 						}
 					} catch (SQLException e) {
-						getHandler().handleException(e);
-						zrusTransakciPokudExistuje();
-						// TODO vracet spis null object
+						handleException(e);
 						return null;
 					}
 				}
 			};
 		} catch (SQLException e) {
-			getHandler().handleException(e);
-			zrusTransakciPokudExistuje();
-			// TODO vracet spis null object
+			handleException(e);
 			return null;
 		}
 	}
 
-	private TypVolani getTyp(Object[] parametry) {
+	private StatementType getTyp(String sql, Object[] parametry) {
 		if (parametry != null && parametry.length > 0) {
-			return TypVolani.PRIPRAVENY;
+			return StatementType.PREPARED;
 		}
-		return TypVolani.NORMALNI;
+		return StatementType.NORMAL;
 
 	}
 

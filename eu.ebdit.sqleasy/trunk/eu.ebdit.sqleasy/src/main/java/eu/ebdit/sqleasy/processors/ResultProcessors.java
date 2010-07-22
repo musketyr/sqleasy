@@ -1,4 +1,4 @@
-package eu.ebdit.sqleasy;
+package eu.ebdit.sqleasy.processors;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

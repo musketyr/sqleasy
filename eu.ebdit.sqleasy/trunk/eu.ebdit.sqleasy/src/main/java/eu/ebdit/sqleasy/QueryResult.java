@@ -1,5 +1,7 @@
 package eu.ebdit.sqleasy;
 
+import eu.ebdit.sqleasy.processors.ResultProcessor;
+
 
 /**
  * Vysledek dotazu do databaze. K ziskani potrebnych dat

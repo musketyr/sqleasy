@@ -27,7 +27,7 @@ public class DbUnitDataLoader
 
         SqlHelper helper = SqlEasy.getHelper(connectionProvider);
 		helper.setHandler(ExceptionHandlers.stackTraceHandler());
-        helper.execute("CREATE TABLE TABULKA (ID int NOT NULL, JMENO varchar(255), PRIJMENI varchar(255), BLA varchar(255))");
+        helper.execute("CREATE TABLE TABULKA (ID int NOT NULL IDENTITY PRIMARY KEY, JMENO varchar(255), PRIJMENI varchar(255), BLA varchar(255))");
         
 
         InputStream testData = DbUnitDataLoader.class.getResourceAsStream("/fancy.db.xml");
