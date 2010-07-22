@@ -154,17 +154,6 @@ class SqlHelperImpl implements SqlHelper {
 		}
 	}
 	
-	private void close(Connection c){
-		try {
-			if (c != null) {
-				c.close();
-			}
-		} catch (SQLException e) {
-			getHandler().handleException(e);
-		}
-	}
-
-	
 
 	/**
 	 * Vytvori helper pro dany datasource
@@ -268,7 +257,7 @@ class SqlHelperImpl implements SqlHelper {
 	private void zavriJeLiTreba(Statement stmt, Connection connection) {
 		close(stmt);
 		if (!jeAktivniTransakce()) {
-			close(connection);
+			connectionProvider.closeConnection(connection, getHandler());
 		}
 	}
 
@@ -331,7 +320,7 @@ class SqlHelperImpl implements SqlHelper {
 			if (t != null) {
 				Connection c = t.getConnection();
 				c.commit();
-				close(c);
+				connectionProvider.closeConnection(c, getHandler());
 			}
 		} catch (SQLException e) {
 			getHandler().handleException(e);
@@ -363,7 +352,7 @@ class SqlHelperImpl implements SqlHelper {
 			if (t != null) {
 				Connection c = t.getConnection();
 				c.rollback();
-				close(c);
+				connectionProvider.closeConnection(c, getHandler());
 			}
 		} catch (SQLException e) {
 			getHandler().handleException(e);

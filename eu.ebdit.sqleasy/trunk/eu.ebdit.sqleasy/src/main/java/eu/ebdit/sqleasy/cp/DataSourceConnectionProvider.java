@@ -20,8 +20,8 @@ class DataSourceConnectionProvider extends DirectDataSourceConnectionProvider {
 		}
 	}
 	
-	public DataSourceConnectionProvider(String dsName) {
-		super(lookupDataSource(dsName));
+	public DataSourceConnectionProvider(String dsName, boolean closeAutomatically) {
+		super(lookupDataSource(dsName), closeAutomatically);
 	}
 	
 	
